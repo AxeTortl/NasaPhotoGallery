@@ -6,30 +6,30 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.GridLayoutManager
 import com.esslinger.msu.photogallery.databinding.FragmentPhotoGalleryBinding
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+//i had chatgpt add to most of this page because I had a lot of errors from my inital changes
 
 class PhotoGalleryFragment : Fragment() {
     private var _binding: FragmentPhotoGalleryBinding? = null
-    private val binding
-        get() = checkNotNull(_binding) {
-            "Cannot access binding because it is null. Is the view visible?"
-        }
+    private val binding get() = _binding!!
 
     private val photoGalleryViewModel: PhotoGalleryViewModel by viewModels()
+
+    private val photoListAdapter = PhotoListAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding =
-            FragmentPhotoGalleryBinding.inflate(inflater, container, false)
+        _binding = FragmentPhotoGalleryBinding.inflate(inflater, container, false)
         binding.photoGrid.layoutManager = GridLayoutManager(context, 3)
+        binding.photoGrid.adapter = photoListAdapter
         return binding.root
     }
 
@@ -37,9 +37,12 @@ class PhotoGalleryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                photoGalleryViewModel.galleryItems.collect { items ->
-                    binding.photoGrid.adapter = PhotoListAdapter(items)
+            photoGalleryViewModel.photoList.collectLatest { pagingData ->
+                photoListAdapter.submitData(pagingData)
+            }
+
+            photoListAdapter.addLoadStateListener { loadState ->
+                if (loadState.refresh is LoadState.Error) {
                 }
             }
         }

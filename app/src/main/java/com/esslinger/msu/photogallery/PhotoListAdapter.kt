@@ -2,6 +2,8 @@ package com.esslinger.msu.photogallery
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.esslinger.msu.photogallery.api.GalleryItem
@@ -17,22 +19,26 @@ class PhotoViewHolder(
     }
 }
 
-class PhotoListAdapter(
-    private val galleryItems: List<GalleryItem>
-) : RecyclerView.Adapter<PhotoViewHolder>() {
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): PhotoViewHolder {
+class PhotoListAdapter :
+    PagingDataAdapter<GalleryItem, PhotoViewHolder>(GalleryItemDiffCallback()) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PhotoViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ListItemGalleryBinding.inflate(inflater, parent, false)
         return PhotoViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-        val item = galleryItems[position]
-        holder.bind(item)
+        getItem(position)?.let { holder.bind(it) }
+    }
+}
+//added this with help from chatgpt
+class GalleryItemDiffCallback : DiffUtil.ItemCallback<GalleryItem>() {
+    override fun areItemsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean {
+        return oldItem.id == newItem.id
     }
 
-    override fun getItemCount() = galleryItems.size
+    override fun areContentsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean {
+        return oldItem == newItem
+    }
 }
