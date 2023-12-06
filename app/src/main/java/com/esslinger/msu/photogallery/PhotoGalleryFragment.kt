@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.esslinger.msu.photogallery.databinding.FragmentPhotoGalleryBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-//i had chatgpt add to most of this page because I had a lot of errors from my inital changes
 
 class PhotoGalleryFragment : Fragment() {
     private var _binding: FragmentPhotoGalleryBinding? = null
@@ -43,6 +42,7 @@ class PhotoGalleryFragment : Fragment() {
 
             photoListAdapter.addLoadStateListener { loadState ->
                 if (loadState.refresh is LoadState.Error) {
+                    // Handle error state
                 }
             }
         }

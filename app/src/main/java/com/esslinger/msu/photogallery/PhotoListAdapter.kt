@@ -1,5 +1,4 @@
 package com.esslinger.msu.photogallery
-
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -32,7 +31,7 @@ class PhotoListAdapter :
         getItem(position)?.let { holder.bind(it) }
     }
 }
-//added this with help from chatgpt
+
 class GalleryItemDiffCallback : DiffUtil.ItemCallback<GalleryItem>() {
     override fun areItemsTheSame(oldItem: GalleryItem, newItem: GalleryItem): Boolean {
         return oldItem.id == newItem.id
